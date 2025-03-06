@@ -1,6 +1,6 @@
 <?php
 require_once('connexionDB.php');
-require_once('../jwt-utils.php');
+require_once('jwt-utils.php');
 
 class GestionAuth {
     private $conn;
@@ -19,9 +19,9 @@ class GestionAuth {
      */
     public function authenticateUser($login, $password) {
         // Récupérer l'utilisateur par son login
-        $query = "SELECT * FROM user WHERE login = :login";
+        $query = "SELECT * FROM utilisateurs WHERE email = :email";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':login', $login);
+        $stmt->bindParam(':email', $login);
         $stmt->execute();
 
         // Vérification de l'existence de l'utilisateur
@@ -29,7 +29,7 @@ class GestionAuth {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             // Vérifier le mot de passe haché avec password_verify
-            if (password_verify($password, $user['password'])) {
+            if (password_verify($password, $user['mot_de_passe'])) {
                 // Génération du token
                 $headers = [
                     'alg' => 'HS256',
@@ -38,7 +38,6 @@ class GestionAuth {
 
                 $payload = [
                     'login' => $login,
-                    'role' => $user['role'],
                     'exp'   => time() + 60
                 ];
 
@@ -60,15 +59,10 @@ class GestionAuth {
             ];
         }
         
-        // Vérifier la validité du token
-        if(!is_jwt_valid($token)) {
-            return false;
-        }
+        return is_jwt_valid($token);
         
         // Extract payload data if needed
-        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-        
-        return true;
+        //$payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
     }
 }
 ?>

@@ -10,17 +10,18 @@ switch ($http_method){
         $data = json_decode($postedData,true); 
         /*Reçoit du json et renvoi une adaptation exploitable en php. Le paramètre true impose un tableau en retour
         et non un objet.*/
-        if(!isset($data['email']) || !isset($data['mot_de_passe'])){
+        if(!isset($data['login']) || !isset($data['password'])){
             deliver_response(400, "Erreur de données, veuiller entrer un 'login' et un 'password' au format JSON", null);
             return;
         }
 
-        $login = $data['email'];
-        $password = $data['mot_de_passe'];
+        $login = $data['login'];
+        $password = $data['password'];
 
-        $jwt = authenticateUser($login, $password);
-
-        if($jwt === false){
+        $authManager = new GestionAuth();
+        $jwt = $authManager->authenticateUser($login, $password);
+        
+        if($jwt == false){
             deliver_response(401, "Authentification échouée", null);
             return;
         }
@@ -36,7 +37,9 @@ switch ($http_method){
         
         $token = $_GET['token'];
         
-        if(!validateToken($token)){
+        $authManager = new GestionAuth();
+
+        if(!$authManager->validateToken($token)){
             deliver_response(401, "Token invalide", null);
             return;
         }
