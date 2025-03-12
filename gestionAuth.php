@@ -38,7 +38,7 @@ class GestionAuth {
 
                 $payload = [
                     'login' => $login,
-                    'exp'   => time() + 60
+                    'exp'   => time() + 3600
                 ];
 
                 $jwt = generate_jwt($headers, $payload);
