@@ -7,7 +7,7 @@ switch ($http_method){
     case "POST" :
         // Récupération des données dans le corps
         $postedData = file_get_contents('php://input');
-        $data = json_decode($postedData,true); 
+        $data = json_decode($postedData, true); 
         /*Reçoit du json et renvoi une adaptation exploitable en php. Le paramètre true impose un tableau en retour
         et non un objet.*/
         if(!isset($data['login']) || !isset($data['password'])){
